@@ -21,7 +21,7 @@ clone_and_test() {
   PROJECT_NAME=$2
   PROJECT_DIRNAME=tmp/$PROJECT_NAME
   METRIC="$METRIC_BASE,project=$PROJECT_NAME,branch=$GIT_BRANCH"
-  CMD="mix credo $PROJECT_DIRNAME --mute-exit-status --format json --strict $CREDO_ARG1 $CREDO_ARG2 $CREDO_ARG3 $CREDO_ARG4 $CREDO_ARG5"
+  CMD="mix credo $PROJECT_DIRNAME --config-file=$PROJECT_DIRNAME/.credo.exs --mute-exit-status --format json --strict $CREDO_ARG1 $CREDO_ARG2 $CREDO_ARG3 $CREDO_ARG4 $CREDO_ARG5"
 
   echo ""
   echo "--> Cloning $PROJECT_NAME ..."
@@ -58,14 +58,7 @@ benchmark() {
   COMMAND=$1 # command to be timed/benchmarked
   METRIC=$2 # metric to be collected
 
-  # The '%N' option does not seem to work on macOS
-  t1=$(date +%s%N)
-  bash -c "$COMMAND"
-  t2=$(date +%s%N)
-  TIME=`expr $t2 - $t1`
-  TIME=`expr $TIME / 1000000`
-
-  echo "$METRIC:$TIME|ms" | nc -C -w 1 -u $STATSD_HOST $STATSD_PORT
+  bash -c "time $COMMAND"
 }
 
 # setup
